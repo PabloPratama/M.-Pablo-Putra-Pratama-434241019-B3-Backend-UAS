@@ -8,22 +8,19 @@ Route::get('/', function () {
     return view('welcome');
 });
 
-// --- RUTE PENYELAMAT BUG SYMLINK WINDOWS ---
-// Rute untuk melayani gambar tiket secara manual untuk mengatasi kelemahan php artisan serve di Windows
-Route::get('/storage/tickets/{filename}', function ($filename) {
-    // Ambil path lokasi asli file disimpan
+// --- RUTE PENYELAMAT BUG SYMLINK WINDOWS (DIPERBARUI) ---
+//Uubah URL-nya dari '/storage/...' menjadi '/ticket-image/...'
+// agar tidak dicegat oleh server Apache/PHP sebelum masuk ke Laravel.
+Route::get('/ticket-image/{filename}', function ($filename) {
     $path = storage_path('app/public/tickets/' . $filename);
     
-    // Jika file tidak ada, kembalikan error 404
     if (!File::exists($path)) {
         abort(404);
     }
 
-    // Baca file dan tipe mimenya (jpg/png)
     $file = File::get($path);
     $type = File::mimeType($path);
 
-    // Buat response file untuk dikirim ke Flutter
     $response = Response::make($file, 200);
     $response->header("Content-Type", $type);
 
